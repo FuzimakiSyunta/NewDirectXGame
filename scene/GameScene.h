@@ -57,18 +57,20 @@ public: // メンバ関数
 	/// </summary>
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
 
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	uint32_t textureHandle_ = 0;
-	uint32_t CleartextureHandle_ = 0u;
 	Model* model_ = nullptr;
 
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Player* player_ = nullptr;
+	//敵
 	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemys_;
 	//// Enemyの生きてるかフラグ
 	Enemy* isEnemy_ = nullptr;
 	EnemyBullet* enemybullet_ = nullptr;
@@ -82,6 +84,7 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+	std::list<EnemyBullet*> enemyBullets_;
 
 	/// <summary>
 	/// ゲームシーン用

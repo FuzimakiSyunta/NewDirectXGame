@@ -12,6 +12,9 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 	delete modelSkydome_;
 	delete railCamera_;
+	for (EnemyBullet* bullet : enemyBullets_) {
+		delete bullet;
+	}
 }
 
 void GameScene::Initialize() {
@@ -24,13 +27,15 @@ void GameScene::Initialize() {
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
 	player_ = new Player();
-	Vector3 playerPosition(0, 0, -1);
+	Vector3 playerPosition(0.0f, -5.0f, 20.0f);
 	player_->Initialize(model_, textureHandle_, playerPosition);
+	
 
 	// 敵キャラの作成
 	enemy_ = new Enemy();
 	// 敵キャラの初期化
 	enemy_->Initialize(model_, textureHandle_);
+	enemy_->SetGameScene(this);
 
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	skydome_ = new Skydome();
@@ -38,22 +43,37 @@ void GameScene::Initialize() {
 
 	// レールカメラ
 	railCamera_ = new RailCmamera();
+	Vector3 radian = {0.0f, 0.0f, 0.0f};
 	railCamera_->Initialize(worldPos, rotate);
 
 	debugCamera_ = new DebugCamera(100, 100);
 
 	//// 自キャラとレールカメラの親子関係を結ぶ
-	//player_->Setparent(&railCamera_->GetWorldTransform());
+	player_->Setparent(&railCamera_->GetWorldTransform());
 
 	AxisIndicator::GetInstance()->SetVisible(true);
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 	// 敵キャラに自キャラのアドレスを渡す
 	enemy_->SetPlayer(player_);
+
+
 }
 
 void GameScene::Update() {
 	player_->Update();
-	enemy_->Update();
+	
+		enemy->Update();
+	
+	for (EnemyBullet* bullet : enemyBullets_) {
+		bullet->Update();
+	}
+	enemyBullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 	skydome_->Update();
 	GameScene::CheakAllCollisions();
 	debugCamera_->Update();
@@ -214,6 +234,5 @@ void GameScene::CheakAllCollisions() {
 	}
 #pragma endregion
 }
-void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
-	// リストに登録する
-}
+void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) { enemyBullets_.push_back(enemyBullet); }
+

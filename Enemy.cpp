@@ -15,7 +15,8 @@ void Enemy::Initialize(Model* model, uint32_t textureHndle) {
 	worldTransform_.scale_ = {20.0f, 20.0f, 20.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 300.0f};
-	Approach();
+
+	isDead_ = false;
 	// 解放
 	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
@@ -23,12 +24,24 @@ void Enemy::Initialize(Model* model, uint32_t textureHndle) {
 
 	//enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
 }
+void Enemy::Approach() {
+	worldTransform_.translation_ = Add(worldTransform_.translation_, enemyVelocty_);
+	if (worldTransform_.translation_.z < -20.0f) {
+
+		phase_ = Phase::Leave;
+	}
+	// 発射タイマーを初期化
+	fireTimer_ = 30;
+}
+void Enemy::OnCollision() { isDead_ = true; }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (isDead_ == false) {
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
+		for (EnemyBullet* bullet : bullets_) {
+			bullet->Draw(viewProjection);
+		}
 	}
 }
 
@@ -48,8 +61,8 @@ void Enemy::Update() {
 		return false;
 	});
 
-	Vector3 move = {0, 0, -0.2f};
-	Vector3 leave = {0.6f, 0.6f, -1.0f};
+	Vector3 move = {0, 0, 0};
+	
 	const float kCharacterSpeed = 0.2f;
 
 	
@@ -110,10 +123,7 @@ void Enemy::Update() {
 }
 Enemy::~Enemy() {}
 
-void Enemy::Approach() {
-	// 発射タイマーを初期化
-	fireTimer_ = 30;
-}
+
 
 void Enemy::Fire() {
 	assert(player_);
@@ -159,4 +169,3 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::OnCollision() {}

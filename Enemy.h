@@ -7,7 +7,7 @@
 #include <list>
 
 class Player;
-
+class GameScene;
 class Enemy {
 
 public: // メンバ関数
@@ -29,11 +29,15 @@ public: // メンバ関数
 	// 弾リストを取得
 	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
 
+	// ゲームシーン
+	void SetGameScene(GameScene* gemeScene) { gameScene_ = gemeScene; }
+
 private: // メンバ関数
 	void Fire();
 	void shot(); // メンバ関数
 	void run();
 	void Approach();
+	void Leave();
 	static void (Enemy::*enemyMove[])(); // メンバ関数ポインタ
 	// 寿命
 	static const int32_t kLifeTime = 10;
@@ -43,12 +47,14 @@ private: // メンバ関数
 	bool isDead_ = false;
 
 private: // メンバ変数
+	const float speed = -0.05f;
+	Vector3 enemyVelocty_ = {0.0f, 0.0f, speed};
 	// 発射間隔
 	static const int kFireInterval = 60;
 
 	// 自キャラ
 	enum class Phase {
-		approach,
+		Approach,
 		Leave,
 	};
 
@@ -60,7 +66,8 @@ private: // メンバ変数
 	uint32_t CleartextureHandle_ = 0u;
 	Enemy* enemy_ = nullptr;
 	Input* input_ = nullptr;
-	Phase phase_ = Phase::approach;
+	Phase phase_ = Phase::Approach;
+	GameScene* gameScene_ = nullptr;
 	// 発射タイマー
 	int32_t fireTimer_ = 0;
 	// 弾

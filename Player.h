@@ -45,6 +45,7 @@ public:
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
 
+
 private:
 	void Rotate();
 
