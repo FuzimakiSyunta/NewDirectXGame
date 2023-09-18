@@ -37,7 +37,7 @@ void GameScene::Initialize() {
 	skydome_->Initialize(modelSkydome_, textureHandle_);
 
 	// レールカメラ
-	railCamera_ = new RailCamera();
+	railCamera_ = new RailCmamera();
 	railCamera_->Initialize(worldPos, rotate);
 
 	debugCamera_ = new DebugCamera(100, 100);

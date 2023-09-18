@@ -75,7 +75,7 @@ private: // メンバ変数
 	Skydome* skydome_ = nullptr;
 	Model* modelSkydome_ = nullptr;
 	// レールカメラをゲームシーンに持たせる
-	RailCamera* railCamera_ = nullptr;
+	RailCmamera* railCamera_ = nullptr;
 	Vector3 worldPos;
 	Vector3 rotate;
 	// デバッグカメラ有効
