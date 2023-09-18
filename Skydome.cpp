@@ -1,28 +1,22 @@
-﻿#include"Skydome.h"
+﻿#include "Skydome.h"
 #include <cassert>
+#define _USE_MATH_DEFINES
+#include "ImGuiManager.h"
+#include "keisan.h"
+#include <math.h>
 
-
-void Skydome::Initialize(Model* model, uint32_t textureHandle) { 
+void Skydome::Initialize(Model* model, uint32_t textureHndle) {
 	assert(model);
 	model_ = model;
-	textureHandle_ = textureHandle;
-
-	worldtransform_.Initialize();
-	// x,y,z方向のスケーリングを設定
-	worldtransform_.scale_ = {1.0f, 1.0f, 1.0f};
-	// x,y,z方向の回転を設定
-	worldtransform_.rotation_ = {0.0f, 0.0f, 0.0f};
-	// x,y,z方向
-	worldtransform_.translation_ = {0.0f, 0.0f, 0.0f};
+	worldTransform_.Initialize();
+	input_ = Input::GetInstance();
+	worldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
+	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 }
 
-void Skydome::Update()
-{
+void Skydome::Update() { worldTransform_.UpdateMatrix(); }
 
-
-}
-
-void Skydome::Draw(ViewProjection& viewProjection_) 
-{
-	model_->Draw(worldtransform_, viewProjection_);
+void Skydome::Draw(ViewProjection& viewProjection) {
+	model_->Draw(worldTransform_, viewProjection);
 }

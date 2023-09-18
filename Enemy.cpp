@@ -10,7 +10,6 @@ void Enemy::Initialize(Model* model, uint32_t textureHndle) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("Enemy.png");
-	CleartextureHandle_ = TextureManager::Load("Clear.png");
 	worldTransform_.Initialize();
 	input_ = Input::GetInstance();
 	worldTransform_.scale_ = {20.0f, 20.0f, 20.0f};
@@ -21,25 +20,15 @@ void Enemy::Initialize(Model* model, uint32_t textureHndle) {
 	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
 	}
-}
 
-void Enemy::OnCollision() {
-	// 時間経過でデス
-	if (--deathTimer_ <= 0) {
-		isDead_ = true;
-	}
+	//enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
-	if (isDead_ == false) {
-		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
-		for (EnemyBullet* bullet : bullets_) {
-			bullet->Draw(viewProjection);
-		}
-	}
-	if (isDead_ == true) {
-		model_->Draw(worldTransform_, viewProjection, CleartextureHandle_);
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
 	}
 }
 
@@ -59,10 +48,11 @@ void Enemy::Update() {
 		return false;
 	});
 
-	Vector3 move = {0, 0, -0.1f};
+	Vector3 move = {0, 0, -0.2f};
 	Vector3 leave = {0.6f, 0.6f, -1.0f};
 	const float kCharacterSpeed = 0.2f;
 
+	
 	(this->*enemyMove[static_cast<size_t>(phase_)])(); // shotを呼び出す
 
 	float EnemyPos[3] = {
@@ -118,7 +108,6 @@ void Enemy::Update() {
 		bullet->Update();
 	}
 }
-
 Enemy::~Enemy() {}
 
 void Enemy::Approach() {
@@ -169,3 +158,5 @@ Vector3 Enemy::GetWorldPosition() {
 
 	return worldPos;
 }
+
+void Enemy::OnCollision() {}

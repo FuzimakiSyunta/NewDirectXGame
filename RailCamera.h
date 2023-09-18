@@ -1,31 +1,24 @@
-﻿#include "WorldTransform.h"
+﻿#pragma once
+#include "Input.h"
+#include "Model.h"
 #include "ViewProjection.h"
-#include"Input.h"
+#include "WorldTransform.h"
 
-///レールカメラ
 class RailCamera {
 public:
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize(const Vector3& worldPos, const Vector3& rotation);
-
-	/// <summary>
-	/// 毎フレーム処理
-	/// </summary>
-	void Update();
+	Vector3 GetWorldPosition();
 
 	const ViewProjection& GetViewProjection() { return viewProjection_; }
 
-	// ワールド座標を取得
-	Vector3 GetWorldTransform();
+	const WorldTransform& GetWorldTransform() { return worldTransform_; }
+
+	void Initialize(Vector3& worldPos, Vector3& rotate);
+
+	void Update();
 
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
-	// キーボード入力
-	Input* input_ = nullptr;
-
 };

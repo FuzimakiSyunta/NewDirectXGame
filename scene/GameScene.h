@@ -70,7 +70,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 	Enemy* enemy_ = nullptr;
 	//// Enemyの生きてるかフラグ
-	// Enemy* isEnemy_ = nullptr;
+	Enemy* isEnemy_ = nullptr;
 	EnemyBullet* enemybullet_ = nullptr;
 	Skydome* skydome_ = nullptr;
 	Model* modelSkydome_ = nullptr;

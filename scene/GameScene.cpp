@@ -214,3 +214,6 @@ void GameScene::CheakAllCollisions() {
 	}
 #pragma endregion
 }
+void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
+	// リストに登録する
+}
