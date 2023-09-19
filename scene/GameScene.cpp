@@ -61,9 +61,9 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	player_->Update();
-	
+	for (Enemy* enemy : enemys_) {
 		enemy->Update();
-	
+	}
 	for (EnemyBullet* bullet : enemyBullets_) {
 		bullet->Update();
 	}
