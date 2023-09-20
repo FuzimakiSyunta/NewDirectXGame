@@ -14,6 +14,7 @@ void Player::Initialize(Model* model, uint32_t textureHndle, Vector3 playerPotis
 	worldTransform_.scale_ = {3.0f, 3.0f, 3.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 30.0f};
+	worldTransform3DReticle_.Initialize();
 	// 解放
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
@@ -31,6 +32,23 @@ void Player::Draw(ViewProjection& viewProjection) {
 }
 
 void Player::Update() {
+	const float kDistancePlayerTo3DRetocle = 50.0f;
+	Vector3 offset = {0, 0, 1.0f};
+	offset = TransformNormal(offset, worldTransform_.matWorld_);
+	offset = Normalize(offset);
+	offset.x *= kDistancePlayerTo3DRetocle;
+	offset.y *= kDistancePlayerTo3DRetocle;
+	offset.z *= kDistancePlayerTo3DRetocle;
+	//3Dレティクル
+	Vector3 Pos;
+	Pos.x = worldTransform_.matWorld_.m[3][0];
+	Pos.y = worldTransform_.matWorld_.m[3][1];
+	Pos.z = worldTransform_.matWorld_.m[3][2];
+	worldTransform3DReticle_.translation_.x = offset.x + Pos.x;
+	worldTransform3DReticle_.translation_.y = offset.y + Pos.y;
+	worldTransform3DReticle_.translation_.z = offset.z + Pos.z;
+	worldTransform3DReticle_.UpdateMatrix();
+	worldTransform3DReticle_.TransferMatrix();
 
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -118,6 +136,13 @@ void Player::Attack() {
 		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
 		// 弾を生成し、初期化
 		PlayerBullet* newBullet = new PlayerBullet();
+		velocity.x = worldTransform3DReticle_.translation_.x - worldTransform_.translation_.x;
+		velocity.y = worldTransform3DReticle_.translation_.y - worldTransform_.translation_.y;
+		velocity.z = worldTransform3DReticle_.translation_.z - worldTransform_.translation_.z;
+		velocity = Normalize(velocity);
+		velocity.x *= kBulletSpeed;
+		velocity.y *= kBulletSpeed;
+		velocity.z *= kBulletSpeed;
 		newBullet->Initialize(model_, GetWorldPosition(), velocity);
 		// 弾を登録する
 		// bullet_ = newBullet;

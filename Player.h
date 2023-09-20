@@ -59,4 +59,7 @@ private:
 	float inputFloat[3] = {0, 0, 0};
 	// 弾
 	std::list<PlayerBullet*> bullets_;
+	// 3Dレティクル　
+	WorldTransform worldTransform3DReticle_;
+
 };

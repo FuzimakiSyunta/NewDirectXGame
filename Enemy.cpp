@@ -6,29 +6,27 @@
 #include "keisan.h"
 #include <math.h>
 
-void Enemy::Initialize(Model* model, uint32_t textureHndle) {
+void Enemy::Initialize(Model *model,Vector3 pos) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("Enemy.png");
 	worldTransform_.Initialize();
 	input_ = Input::GetInstance();
-	worldTransform_.scale_ = {20.0f, 20.0f, 20.0f};
+	worldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 300.0f};
 	Approach();
-	// 解放
-	for (EnemyBullet* bullet : bullets_) {
-		delete bullet;
-	}
+	
+	
 
 	//enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	if (isDead_ == false)
+	{
+		model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(viewProjection);
 	}
 }
 
@@ -40,13 +38,7 @@ void (Enemy::*Enemy::enemyMove[])() = {
 
 void Enemy::Update() {
 
-	bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
+	
 
 	Vector3 move = {0, 0, -0.2f};
 	Vector3 leave = {0.6f, 0.6f, -1.0f};
@@ -104,11 +96,11 @@ void Enemy::Update() {
 		fireTimer_ = kFireInterval;
 	}
 
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}
 }
-Enemy::~Enemy() {}
+Enemy::~Enemy()
+{
+	
+}
 
 void Enemy::Approach() {
 	// 発射タイマーを初期化
@@ -120,11 +112,9 @@ void Enemy::Fire() {
 	const float kBulletSpeed = -0.3f;
 	Vector3 speed = {2.0f, 2.0f, 2.0f};
 	Vector3 velocity(0, 0, kBulletSpeed);
-
 	Vector3 subVector = Subtract(player_->GetWorldPosition(), GetWorldPosition());
 	subVector = Normalize(subVector);
 	subVector = VectorMultiply(subVector, speed);
-
 	velocity = subVector;
 
 	// 向き
@@ -132,8 +122,8 @@ void Enemy::Fire() {
 	// 弾を生成し、初期化
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
-	// 弾を登録する
-	bullets_.push_back(newBullet);
+	//// 弾を登録する
+	//bullets_.push_back(newBullet);
 }
 
 void Enemy::shot() {
@@ -159,4 +149,4 @@ Vector3 Enemy::GetWorldPosition() {
 	return worldPos;
 }
 
-void Enemy::OnCollision() {}
+void Enemy::OnCollision() { isDead_ = true; }

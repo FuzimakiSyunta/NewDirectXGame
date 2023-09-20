@@ -12,4 +12,6 @@ void WorldTransform::UpdateMatrix() {
 	}
 
 	TransferMatrix();
+	//// 2Dレティクル用スプライト
+	//Sprite* sprite2DReticle_ = nullptr;
 };

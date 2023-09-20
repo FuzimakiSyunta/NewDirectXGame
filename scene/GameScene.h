@@ -14,6 +14,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include<sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -56,6 +57,17 @@ public: // メンバ関数
 	/// 敵弾を追加しよう
 	/// </summary>
 	void AddEnemyBullet(EnemyBullet* enemyBullet);
+	/// <summary>
+	/// 敵データ読み込み
+	/// </summary>
+	void LoadEnemyPopData();
+	/// <summary>
+	/// 敵コマンド更新
+	/// </summary>
+	void UpdateEnemyPopCommands();
+	
+	//// 敵弾リストの取得
+	//const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -68,10 +80,16 @@ private: // メンバ変数
 	WorldTransform worldTransform_;
 	ViewProjection viewProjection_;
 	Player* player_ = nullptr;
-	Enemy* enemy_ = nullptr;
+	
+	
+	//Enemy* enemy_ = nullptr;
+	// 敵
+	std::list<Enemy*> enemys_;
 	//// Enemyの生きてるかフラグ
 	Enemy* isEnemy_ = nullptr;
 	EnemyBullet* enemybullet_ = nullptr;
+	// 弾
+	std::list<EnemyBullet*> bullets_;
 	Skydome* skydome_ = nullptr;
 	Model* modelSkydome_ = nullptr;
 	// レールカメラをゲームシーンに持たせる
@@ -82,8 +100,10 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
+	// 敵発生コマンド
+	std::stringstream enemyPopCommands;
 
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
+	// 待機時間
+	bool isTime = true;
+	int waitingTime = 120;
 };

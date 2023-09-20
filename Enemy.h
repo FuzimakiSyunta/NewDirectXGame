@@ -7,14 +7,14 @@
 #include <list>
 
 class Player;
-
+class GameScene;
 class Enemy {
 
 public: // メンバ関数
 	// デストラクタ
 	~Enemy();
 
-	void Initialize(Model* model, uint32_t textureHndle);
+	void Initialize(Model* model,Vector3 pos);
 
 	void Update();
 
@@ -26,8 +26,12 @@ public: // メンバ関数
 	// コールバック関数
 	void OnCollision();
 
-	// 弾リストを取得
-	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+	
+	////// 弾リストを取得
+	//const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+
+	// ゲームシーン
+	void SetGameScene(GameScene* gemeScene) { gameScene_ = gemeScene; }
 
 private: // メンバ関数
 	void Fire();
@@ -63,6 +67,8 @@ private: // メンバ変数
 	Phase phase_ = Phase::approach;
 	// 発射タイマー
 	int32_t fireTimer_ = 0;
-	// 弾
-	std::list<EnemyBullet*> bullets_;
+	// ゲームシーン
+	GameScene* gameScene_ = nullptr;
+	
+	
 };
