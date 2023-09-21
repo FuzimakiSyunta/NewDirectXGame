@@ -3,6 +3,7 @@
 #include "ImGuiManager.h"
 #include "TextureManager.h"
 #include <cassert>
+#include <fstream>
 
 GameScene::GameScene() {}
 
@@ -12,10 +13,17 @@ GameScene::~GameScene() {
 	delete debugCamera_;
 	delete modelSkydome_;
 	delete railCamera_;
+	// 解放
+	for (EnemyBullet* bullet : bullets_) {
+		delete bullet;
+	}
+	// 解放
+	for (Enemy* enemys : enemys_) {
+		delete enemys;
+	}
 }
-
 void GameScene::Initialize() {
-
+	TextureManager::Load("./Resources/Reticle.png");
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
@@ -26,15 +34,12 @@ void GameScene::Initialize() {
 	player_ = new Player();
 	Vector3 playerPosition(0, 0, -1);
 	player_->Initialize(model_, textureHandle_, playerPosition);
-
-	// 敵キャラの作成
-	// enemy_ = new Enemy();
-
-	//// 敵キャラの初期化
-	// enemy_->Initialize(model_, textureHandle_);
-	/*for (Enemy* enemys : enemys_) {
-	    delete enemys;
-	}*/
+	//// 敵を生成し、初期化
+	Enemy* enemy = new Enemy();
+	enemy->Initialize(model_, Vector3(0, 0, 0));
+	enemy->SetGameScene(this);
+	enemy->SetPlayer(player_);
+	enemys_.push_back(enemy);
 	// 敵
 	LoadEnemyPopData();
 
@@ -49,17 +54,11 @@ void GameScene::Initialize() {
 	debugCamera_ = new DebugCamera(100, 100);
 
 	//// 自キャラとレールカメラの親子関係を結ぶ
-	// player_->Setparent(&railCamera_->GetWorldTransform());
+	player_->Setparent(&railCamera_->GetWorldTransform());
 
 	AxisIndicator::GetInstance()->SetVisible(true);
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
-	// 敵キャラに自キャラのアドレスを渡す
-	// enemy_->SetPlayer(player_);
-	//// 敵を生成し、初期化
-	// Enemy* newEnemy = new Enemy();
-	// newEnemy->Initialize(model_, textureHandle_);
-	//// 敵を登録する
-	// enemys_.push_back(newEnemy);
+	
 }
 
 void GameScene::LoadEnemyPopData() {
@@ -103,7 +102,7 @@ void GameScene::UpdateEnemyPopCommands() {
 			// 敵発生
 			//// 敵を生成し、初期化
 			Enemy* enemy = new Enemy();
-			enemy->Initialize(model_,Vector3(x, y, z));  
+			enemy->Initialize(model_, Vector3(x, y, z));
 			enemy->SetGameScene(this);
 			enemy->SetPlayer(player_);
 			enemys_.push_back(enemy);
@@ -121,7 +120,7 @@ void GameScene::UpdateEnemyPopCommands() {
 }
 void GameScene::Update() {
 	UpdateEnemyPopCommands();
-	player_->Update();
+	player_->Update(viewProjection_);
 	for (Enemy* enemys_ : enemys_) {
 		enemys_->Update();
 	}
@@ -207,9 +206,11 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	player_->DrawUI();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
+
 
 #pragma endregion
 }
@@ -234,9 +235,9 @@ void GameScene::CheakAllCollisions() {
 	posA = player_->GetWorldPosition();
 
 	// 自キャラと敵弾すべての当たり判定
-	for (EnemyBullet* bullet : enemyBullets) {
+	for (EnemyBullet* enemybullet_ : bullets_) {
 		// 敵弾の座標
-		posB = bullet->GetWorldPosition();
+		posB = enemybullet_->GetWorldPosition();
 		// AとBの距離を求める
 		posAB = (posB.x - posA.x) * (posB.x - posA.x) + (posB.y - posA.y) * (posB.y - posA.y) +
 		        (posB.z - posA.z) * (posB.z - posA.z);
@@ -245,7 +246,7 @@ void GameScene::CheakAllCollisions() {
 			// 自キャラの衝突時コールバックを呼び出す
 			player_->OnCollision();
 			// 敵弾の衝突時コールバックを呼び出す
-			bullet->OnCollision();
+			enemybullet_->OnCollision();
 		}
 	}
 #pragma endregion
@@ -254,7 +255,7 @@ void GameScene::CheakAllCollisions() {
 	// 自弾の半径
 	float playerBulletRadius = 3.0f;
 	// 敵キャラの半径
-	float enemyRadius = 30.0f;
+	float enemyRadius = 5.0f;
 
 	// 敵キャラのワールド座標
 	for (Enemy* enemys_ : enemys_) {
@@ -287,7 +288,7 @@ void GameScene::CheakAllCollisions() {
 #pragma region 自弾と敵弾の当たり判定
 	float posBD;
 	for (PlayerBullet* playerbullet : playerBullets) {
-		for (EnemyBullet* enemybullet : enemyBullets) {
+		for (EnemyBullet* enemybullet : bullets_) {
 			posBD = (posB.x - posD.x) * (posB.x - posD.x) + (posB.y - posD.y) * (posB.y - posD.y) +
 			        (posB.z - posD.z) * (posB.z - posD.z);
 			// 球と球の当たり判定

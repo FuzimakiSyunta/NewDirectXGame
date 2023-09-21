@@ -5,6 +5,7 @@
 #include "PlayerBullet.h"
 #include "WorldTransform.h"
 #include <list>
+#include <Sprite.h>
 
 /// <summary>
 /// 自キャラ
@@ -24,7 +25,7 @@ public:
 	/// 自キャラ
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
@@ -44,6 +45,10 @@ public:
 
 	// 弾リストを取得
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
 
 private:
 	void Rotate();
@@ -61,5 +66,8 @@ private:
 	std::list<PlayerBullet*> bullets_;
 	// 3Dレティクル　
 	WorldTransform worldTransform3DReticle_;
-
+	// 2Dレティクル用スプライト
+	Sprite* sprite2DReticle_ = nullptr;
+	Vector2 ReticlePos = {640, 320};
+	Vector3 positionReticle;
 };

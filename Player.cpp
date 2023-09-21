@@ -4,6 +4,8 @@
 #include "ImGuiManager.h"
 #include "keisan.h"
 #include <math.h>
+#include"WinApp.h"
+
 
 void Player::Initialize(Model* model, uint32_t textureHndle, Vector3 playerPotision) {
 	assert(model);
@@ -15,10 +17,15 @@ void Player::Initialize(Model* model, uint32_t textureHndle, Vector3 playerPotis
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 30.0f};
 	worldTransform3DReticle_.Initialize();
-	// 解放
-	for (PlayerBullet* bullet : bullets_) {
-		delete bullet;
-	}
+	uint32_t textureReticle = TextureManager::Load("./Resources/Reticle.png");
+	ReticlePos.x = 760;
+	ReticlePos.y = 320;
+	sprite2DReticle_ =
+	    Sprite::Create(textureReticle, ReticlePos, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+	//// 解放
+	//for (PlayerBullet* bullet : bullets_) {
+	//	delete bullet;
+	//}
 }
 
 void Player::Draw(ViewProjection& viewProjection) {
@@ -30,8 +37,9 @@ void Player::Draw(ViewProjection& viewProjection) {
 		bullet->Draw(viewProjection);
 	}
 }
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
 
-void Player::Update() {
+void Player::Update(ViewProjection& viewProjection) {
 	const float kDistancePlayerTo3DRetocle = 50.0f;
 	Vector3 offset = {0, 0, 1.0f};
 	offset = TransformNormal(offset, worldTransform_.matWorld_);
@@ -39,7 +47,7 @@ void Player::Update() {
 	offset.x *= kDistancePlayerTo3DRetocle;
 	offset.y *= kDistancePlayerTo3DRetocle;
 	offset.z *= kDistancePlayerTo3DRetocle;
-	//3Dレティクル
+	// 3Dレティクル
 	Vector3 Pos;
 	Pos.x = worldTransform_.matWorld_.m[3][0];
 	Pos.y = worldTransform_.matWorld_.m[3][1];
@@ -49,6 +57,19 @@ void Player::Update() {
 	worldTransform3DReticle_.translation_.z = offset.z + Pos.z;
 	worldTransform3DReticle_.UpdateMatrix();
 	worldTransform3DReticle_.TransferMatrix();
+
+	//3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	Vector3 positionReticle = GetWorldPosition();
+
+	//
+	Matrix4x4 matViewport =
+	    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+	//
+	Matrix4x4 matViewProjectionViewport =
+	    Multiply(viewProjection.matView, Multiply(viewProjection.matProjection, matViewport));
+	positionReticle = Transform(positionReticle, matViewProjectionViewport);
+	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+
 
 	bullets_.remove_if([](PlayerBullet* bullet) {
 		if (bullet->IsDead()) {
@@ -165,4 +186,5 @@ void Player::OnCollision() {}
 // 親子関係を結ぶ
 void Player::Setparent(const WorldTransform* parent) { worldTransform_.parent_ = parent; }
 
-Player::~Player() {}
+Player::~Player() 
+{ delete sprite2DReticle_; }

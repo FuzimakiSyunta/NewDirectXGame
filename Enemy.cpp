@@ -6,7 +6,7 @@
 #include "keisan.h"
 #include <math.h>
 
-void Enemy::Initialize(Model *model,Vector3 pos) {
+void Enemy::Initialize(Model* model, Vector3 pos) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("Enemy.png");
@@ -15,18 +15,15 @@ void Enemy::Initialize(Model *model,Vector3 pos) {
 	worldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 300.0f};
+	isDead_ = false;
 	Approach();
-	
-	
 
-	//enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
+	// enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
-	if (isDead_ == false)
-	{
+	if (isDead_ == false) {
 		model_->Draw(worldTransform_, viewProjection, textureHandle_);
-
 	}
 }
 
@@ -38,13 +35,12 @@ void (Enemy::*Enemy::enemyMove[])() = {
 
 void Enemy::Update() {
 
-	
-
 	Vector3 move = {0, 0, -0.2f};
 	Vector3 leave = {0.6f, 0.6f, -1.0f};
 	const float kCharacterSpeed = 0.2f;
 
-	
+
+
 	(this->*enemyMove[static_cast<size_t>(phase_)])(); // shotを呼び出す
 
 	float EnemyPos[3] = {
@@ -95,12 +91,8 @@ void Enemy::Update() {
 		Fire();
 		fireTimer_ = kFireInterval;
 	}
-
 }
-Enemy::~Enemy()
-{
-	
-}
+Enemy::~Enemy() {}
 
 void Enemy::Approach() {
 	// 発射タイマーを初期化
@@ -123,7 +115,7 @@ void Enemy::Fire() {
 	EnemyBullet* newBullet = new EnemyBullet();
 	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
 	//// 弾を登録する
-	//bullets_.push_back(newBullet);
+	// bullets_.push_back(newBullet);
 }
 
 void Enemy::shot() {
