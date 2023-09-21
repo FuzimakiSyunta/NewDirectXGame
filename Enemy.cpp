@@ -7,6 +7,7 @@
 #include <math.h>
 
 void Enemy::Initialize(Model* model, Vector3 pos) {
+	isDead_ = false;
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("Enemy.png");
@@ -14,11 +15,10 @@ void Enemy::Initialize(Model* model, Vector3 pos) {
 	input_ = Input::GetInstance();
 	worldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
-	worldTransform_.translation_ = {0.0f, 0.0f, 300.0f};
-	isDead_ = false;
-	Approach();
-
-	// enemyMove = &Enemy::shot; // ポインタに関数のアドレスを代入
+	worldTransform_.translation_ = {0.0f, 0.0f, -300.0f};
+	worldTransform_.translation_.x = pos.x;
+	worldTransform_.translation_.y = pos.y;
+	worldTransform_.translation_.z = pos.z;
 }
 
 void Enemy::Draw(ViewProjection& viewProjection) {
