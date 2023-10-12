@@ -70,4 +70,6 @@ private:
 	Sprite* sprite2DReticle_ = nullptr;
 	Vector2 ReticlePos = {640, 320};
 	Vector3 positionReticle;
+	// コントローラー
+	XINPUT_STATE joyState;
 };

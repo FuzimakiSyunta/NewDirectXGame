@@ -53,8 +53,8 @@ void GameScene::Initialize() {
 
 	debugCamera_ = new DebugCamera(100, 100);
 
-	//// 自キャラとレールカメラの親子関係を結ぶ
-	player_->Setparent(&railCamera_->GetWorldTransform());
+	////// 自キャラとレールカメラの親子関係を結ぶ
+	//player_->Setparent(&railCamera_->GetWorldTransform());
 
 	AxisIndicator::GetInstance()->SetVisible(true);
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
